@@ -1,14 +1,20 @@
 {
   "extends": "airbnb",
   "rules": {
-    "react/jsx-filename-extension": [1, {
-      "extensions": [".js", ".jsx"]
-    }],
+    "react/jsx-filename-extension": [
+      1,
+      {
+        "extensions": [".js", ".jsx"]
+      }
+    ],
     "consistent-return": 0,
     "import/newline-after-import": false,
     "prefer-destructuring": 0,
     "global-require": 0,
-    "no-console": 0
+    "no-console": 0,
+    "comma-dangle": 0,
+    "arrow-parens": 0,
+    "function-paren-newline": 0
   },
   "env": {
     "jest": true

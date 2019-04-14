@@ -3,16 +3,15 @@ import { InputWithButton } from 'watson-react-components';
 import PropTypes from 'prop-types';
 import ChatList from '../ChatList/ChatList';
 
-const ChatContainer = ({
-  messages,
-  onUserInput,
-  botMessageStatus,
-}) => (
+const ChatContainer = ({ messages, onUserInput, botMessageStatus }) => (
   <div className="ibm-col-lg-8 ibm-col-md-6 ibm-col-sm-4 chat-container">
     <div className="ibm-lg-col-4 ibm-padding chat-container__header">
-      <p className="ibm-type-a">BankBot</p>
+      <p className="ibm-type-a">Kanye Bot</p>
     </div>
-    <div id="chat-container__list-wrapper" className="chat-container__list-wrapper">
+    <div
+      id="chat-container__list-wrapper"
+      className="chat-container__list-wrapper"
+    >
       <ChatList
         messages={messages}
         onUserInput={onUserInput}
@@ -22,7 +21,7 @@ const ChatContainer = ({
     <div className="ibm-lg-col-4 ibm-padding chat-container__input">
       <InputWithButton
         id="input_field"
-        onSubmit={(e) => {
+        onSubmit={e => {
           onUserInput('user', e.target.value);
           e.target.value = '';
         }}
@@ -33,13 +32,13 @@ const ChatContainer = ({
 );
 
 ChatContainer.defaultProps = {
-  botMessageStatus: null,
+  botMessageStatus: null
 };
 
 ChatContainer.propTypes = {
   messages: PropTypes.array.isRequired,
   onUserInput: PropTypes.func.isRequired,
-  botMessageStatus: PropTypes.string,
+  botMessageStatus: PropTypes.string
 };
 
 export default ChatContainer;

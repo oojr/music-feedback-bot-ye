@@ -23,9 +23,9 @@ const bank = require('./lib/bankFunctions');
 
 // declare Watson Assistant service
 const assistant = new AssistantV2({
-  version: '2018-11-08',
-  username: process.env.ASSISTANT_USERNAME || '<username>',
-  password: process.env.ASSISTANT_PASSWORD || '<password>',
+  url: 'https://gateway.watsonplatform.net/assistant/api/',
+  version: '2019-02-28',
+  iam_apikey: 'NgmaEVLsmkXFRW2v92mPqLdADh45w3DW0OgztqMhCFqY'
 });
 
 const date = new Date();
@@ -33,8 +33,8 @@ date.setMonth(date.getMonth() + 1);
 const newContext = {
   global: {
     system: {
-      turn_count: 1,
-    },
+      turn_count: 1
+    }
   },
   skills: {
     'main skill': {
@@ -42,14 +42,10 @@ const newContext = {
         acc_minamt: 50,
         acc_currbal: 430,
         acc_paydue: `${date.getFullYear()}-${date.getMonth() + 1}-26 12:00:00`,
-        accnames: [
-          5624,
-          5893,
-          9225,
-        ],
-      },
-    },
-  },
+        accnames: [5624, 5893, 9225]
+      }
+    }
+  }
 };
 
 app.get('/', (req, res) => {
@@ -58,16 +54,18 @@ app.get('/', (req, res) => {
 
 app.post('/api/message', (req, res) => {
   // check for workspace id and handle null workspace env variable
-  const assistantId = process.env.ASSISTANT_ID || '<workspace-id>';
-  if (!assistantId || assistantId === '<workspace-id>') {
+  const assistantId =
+    process.env.ASSISTANT_ID || 'd9ace4b6-ebbf-496b-adab-ee59378a01ba';
+  if (!assistantId) {
     return res.json({
       output: {
-        text: 'The app has not been configured with a ASSISTANT_ID environment variable.',
-      },
+        text:
+          'The app has not been configured with a ASSISTANT_ID environment variable.'
+      }
     });
   }
 
-  const contextWithAcc = (req.body.context) ? req.body.context : newContext;
+  const contextWithAcc = req.body.context ? req.body.context : newContext;
 
   if (req.body.context) {
     contextWithAcc.global.system.turn_count += 1;
@@ -88,9 +86,9 @@ app.post('/api/message', (req, res) => {
       message_type: 'text',
       text: textIn,
       options: {
-        return_context: true,
-      },
-    },
+        return_context: true
+      }
+    }
   };
 
   // send payload to Conversation and return result
@@ -123,22 +121,33 @@ app.get('/bank/locate', (req, res) => {
 
 app.get('/bank/statement', (req, res) => {
   const startingDate = new Date(req.query.value);
-  const endingDate = new Date(startingDate.getFullYear(), startingDate.getMonth() + 1, 0);
+  const endingDate = new Date(
+    startingDate.getFullYear(),
+    startingDate.getMonth() + 1
+  );
   const startingDateString = startingDate.toLocaleDateString();
   const endingDateString = endingDate.toLocaleDateString();
 
-  res.send({ result: 'statement', dates: { startingDate: startingDateString, endingDate: endingDateString } });
+  res.send({
+    result: 'statement',
+    dates: { startingDate: startingDateString, endingDate: endingDateString }
+  });
 });
 
 app.get('/api/session', (req, res) => {
-  assistant.createSession({
-    assistant_id: process.env.ASSISTANT_ID || '{assistant_id}',
-  }, (error, response) => {
-    if (error) {
-      return res.send(error);
+  assistant.createSession(
+    {
+      assistant_id:
+        process.env.ASSISTANT_ID || 'd9ace4b6-ebbf-496b-adab-ee59378a01ba'
+    },
+    (error, response) => {
+      if (error) {
+        console.log('error with the session', error);
+        return res.send(error);
+      }
+      return res.send(response);
     }
-    return res.send(response);
-  });
+  );
 });
 
 module.exports = app;

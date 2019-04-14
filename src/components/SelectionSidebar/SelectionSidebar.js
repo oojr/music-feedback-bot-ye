@@ -8,7 +8,7 @@ class SelectionSidebar extends React.Component {
     super(props);
 
     this.state = {
-      isOverlayVisible: false,
+      isOverlayVisible: false
     };
   }
 
@@ -52,19 +52,34 @@ class SelectionSidebar extends React.Component {
         <div className="path-selection__path-header">
           <DemoButton
             icon="path"
-            onClick={() => { this.onEnter(); }}
+            onClick={() => {
+              this.onEnter();
+            }}
           />
           <p className="ibm-type-a">See all features</p>
         </div>
+        <img
+          alt="album cover"
+          src="https://pixel.nymag.com/imgs/daily/vulture/2018/06/01/01-kanye-west-ye.w1200.h1200.jpg"
+          style={{ width: 200, height: 200 }}
+        />
         <PathSelectionOverlay
           isOverlayVisible={this.state.isOverlayVisible}
-          onEnter={() => { this.onEnter(); }}
-          onExit={() => { this.onExit(); }}
+          onEnter={() => {
+            this.onEnter();
+          }}
+          onExit={() => {
+            this.onExit();
+          }}
           paths={this.props.paths}
-          onPathSelect={(path) => { this.onPathSelect(path); }}
+          onPathSelect={path => {
+            this.onPathSelect(path);
+          }}
         />
         <div className="path-selection__description">
-          <p className="ibm-type-c">{this.props.currentPath}/{this.props.paths.length}</p>
+          <p className="ibm-type-c">
+            {this.props.currentPath}/{this.props.paths.length}
+          </p>
           <p className="ibm-type-c duo-gray-20">
             {this.props.paths[this.props.currentPath - 1].label}
           </p>
@@ -74,11 +89,15 @@ class SelectionSidebar extends React.Component {
           <div className="path-selection__nav-buttons">
             <DemoButton
               icon="arrow-left"
-              onClick={() => { this.props.onPathSelect(validPaths.back); }}
+              onClick={() => {
+                this.props.onPathSelect(validPaths.back);
+              }}
             />
             <DemoButton
               icon="arrow-right"
-              onClick={() => { this.props.onPathSelect(validPaths.forward); }}
+              onClick={() => {
+                this.props.onPathSelect(validPaths.forward);
+              }}
             />
           </div>
         </div>
@@ -90,7 +109,7 @@ class SelectionSidebar extends React.Component {
 SelectionSidebar.propTypes = {
   onPathSelect: PropTypes.func.isRequired,
   paths: PropTypes.array.isRequired,
-  currentPath: PropTypes.number.isRequired,
+  currentPath: PropTypes.number.isRequired
 };
 
 export default SelectionSidebar;

@@ -8,20 +8,25 @@ const PathSelectionOverlay = ({
   onEnter,
   onExit,
   paths,
-  onPathSelect,
+  onPathSelect
 }) => (
   <Modal
     isOpen={isOverlayVisible}
-    onExit={() => { onExit(); }}
-    onEnter={() => { onEnter(); }}
+    onExit={() => {
+      onExit();
+    }}
+    onEnter={() => {
+      onEnter();
+    }}
   >
     <div className="path-selection-overlay__container">
       <div className="path-selection-overlay">
         <div className="path-selection-overlay__card-group">
           <div className="path-selection-card__card-intro">
-            <p className="ibm-type-c">In this demo, Watson Assistant has been trained
-              on specific banking capabilities.
-              Choose one of the {paths.length} scenarios to explore.
+            <p className="ibm-type-c">
+              In this demo, Watson Assistant has been trained on specific
+              conversational music capabilities. Choose one of the{' '}
+              {paths.length} scenarios to explore.
             </p>
           </div>
           {paths.map(path => (
@@ -30,7 +35,9 @@ const PathSelectionOverlay = ({
               pathNode={path.id}
               label={path.label}
               path={path.path}
-              onClick={() => { onPathSelect(path); }}
+              onClick={() => {
+                onPathSelect(path);
+              }}
             />
           ))}
         </div>
@@ -44,7 +51,7 @@ PathSelectionOverlay.propTypes = {
   onEnter: PropTypes.func.isRequired,
   onExit: PropTypes.func.isRequired,
   paths: PropTypes.array.isRequired,
-  onPathSelect: PropTypes.func.isRequired,
+  onPathSelect: PropTypes.func.isRequired
 };
 
 export default PathSelectionOverlay;

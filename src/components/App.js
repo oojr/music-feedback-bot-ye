@@ -2,25 +2,28 @@ import React from 'react';
 import ChatContainer from './ChatContainer/ChatContainer';
 import SelectionSidebar from './SelectionSidebar/SelectionSidebar';
 import OptionsSidebar from './OptionsSidebar/OptionsSidebar';
-import { fetchMessage, executeClientAction, executeWorkspaceAction } from '../conversation';
+import {
+  fetchMessage,
+  executeClientAction,
+  executeWorkspaceAction
+} from '../conversation';
 import { IDLE, IN_PROGRESS, COMPLETED, FAILED } from '../constants';
 import trackEvent from '../utils';
 
 require('smoothscroll-polyfill').polyfill();
 
-
-const parseNonGenericResponsesFromBotOutput = (genericObj) => {
+const parseNonGenericResponsesFromBotOutput = genericObj => {
   const responses = [];
-  genericObj.forEach((response) => {
+  genericObj.forEach(response => {
     if (response.response_type === 'title') {
       responses.push({
         type: 'bot',
-        content: response.text,
+        content: response.text
       });
     } else if (response.response_type === 'option') {
       responses.push({
         type: 'bot',
-        content: response.title,
+        content: response.title
       });
 
       let preference = 'text';
@@ -31,7 +34,7 @@ const parseNonGenericResponsesFromBotOutput = (genericObj) => {
       const res = {
         type: 'option',
         display: 'list',
-        content: response.options,
+        content: response.options
       };
 
       if (preference === 'button') {
@@ -42,19 +45,19 @@ const parseNonGenericResponsesFromBotOutput = (genericObj) => {
       responses.push({
         type: response.response_type,
         time: response.time,
-        typing: response.typing,
+        typing: response.typing
       });
     } else if (response.response_type === 'text') {
       if (response.text !== '') {
         responses.push({
           type: 'bot',
-          content: response.text,
+          content: response.text
         });
       }
     } else if (response.response_type === 'image') {
       responses.push({
         type: 'image',
-        content: response.source,
+        content: response.source
       });
     }
   });
@@ -73,26 +76,27 @@ class App extends React.Component {
       paths: [
         {
           id: 1,
-          label: 'Make a Payment',
-          description: 'Utilize buttons and other response types, like photos or bank balances, to help expedite the credit card payment process.',
-          path: 'How can I make payments to my credit card?',
+          label: 'Review Album',
+          description:
+            'Start a conversation with a Kanye West and review his latest album ',
+          path: 'How can I make payments to my credit card?'
         },
         {
           id: 2,
-          label: 'Book an Appointment',
-          description: 'Provide the required information to schedule an appointment in a flexible, conversational manner.',
-          path: 'I want to book an appointment',
+          label: 'Tell Your Favorite Song',
+          description: 'Provide the song you like the most about the album.',
+          path: 'I want to book an appointment'
         },
         {
           id: 3,
-          label: 'Recommend a Credit Card',
-          description: 'Describe your ideal credit card and receive a recommendation tailored to your preferences.',
-          path: 'Can you help me choose a credit card?',
-        },
+          label: 'Describe your favorite lyric',
+          description: 'Describe your favorite lyric from the album',
+          path: 'Can you help me choose a credit card?'
+        }
       ],
       currentPath: 1,
       notificationText: '',
-      notificationLink: null,
+      notificationLink: null
     };
   }
 
@@ -112,6 +116,7 @@ class App extends React.Component {
 
   updateChatList(messageObj) {
     const chatList = document.getElementById('chat-list');
+    console.log('the message,', messageObj);
     this.setState({ messages: [...this.state.messages, messageObj] }, () => {
       // only scroll when watson responds
       if (messageObj.type !== 'user') {
@@ -162,33 +167,42 @@ class App extends React.Component {
     let responses = [];
     // check for chat options in generic options object
     if (outputObj.output.generic !== undefined) {
-      responses = responses.concat(parseNonGenericResponsesFromBotOutput(outputObj.output.generic));
+      responses = responses.concat(
+        parseNonGenericResponsesFromBotOutput(outputObj.output.generic)
+      );
     }
 
     // execute client programmatic actions if they exist
-    if (outputObj.output.actions
-      && outputObj.output.actions.length > 0) {
+    if (outputObj.output.actions && outputObj.output.actions.length > 0) {
       console.log(JSON.stringify(outputObj.actions, null, 2));
       const actions = outputObj.output.actions;
-      actions.forEach((act) => {
-        executeClientAction(act)
-          .then((result) => {
-            if (!outputObj.context.skip_user_input) {
-              this.sendMessageToConversation(result.result, this.state.lastMessageContext);
-            } else if (result.result === 'statement') {
-              const action = executeWorkspaceAction({ statement_display: result.dates });
-              responses.push(action);
-            }
-          });
+      actions.forEach(act => {
+        executeClientAction(act).then(result => {
+          if (!outputObj.context.skip_user_input) {
+            this.sendMessageToConversation(
+              result.result,
+              this.state.lastMessageContext
+            );
+          } else if (result.result === 'statement') {
+            const action = executeWorkspaceAction({
+              statement_display: result.dates
+            });
+            responses.push(action);
+          }
+        });
       });
     }
 
     // execute standard workspace actions if they exist
-    if (outputObj.output.user_defined !== undefined
-      && outputObj.output.user_defined.action !== undefined) {
-      const actionResponseArray = executeWorkspaceAction(outputObj.output.user_defined.action);
+    if (
+      outputObj.output.user_defined !== undefined &&
+      outputObj.output.user_defined.action !== undefined
+    ) {
+      const actionResponseArray = executeWorkspaceAction(
+        outputObj.output.user_defined.action
+      );
 
-      actionResponseArray.forEach((actionResponse) => {
+      actionResponseArray.forEach(actionResponse => {
         if (actionResponse.type !== 'notification') {
           responses.push(actionResponse);
         } else {
@@ -199,11 +213,15 @@ class App extends React.Component {
     }
 
     // execute standard workspace UI Action if they exist
-    if (outputObj.output.user_defined !== undefined
-      && outputObj.output.user_defined.ui_action !== undefined) {
-      const actionResponseArray = executeWorkspaceAction(outputObj.output.user_defined.ui_action);
+    if (
+      outputObj.output.user_defined !== undefined &&
+      outputObj.output.user_defined.ui_action !== undefined
+    ) {
+      const actionResponseArray = executeWorkspaceAction(
+        outputObj.output.user_defined.ui_action
+      );
 
-      actionResponseArray.forEach((actionResponse) => {
+      actionResponseArray.forEach(actionResponse => {
         if (actionResponse.type !== 'notification') {
           console.log(JSON.stringify(actionResponse));
           responses.push(actionResponse);
@@ -214,8 +232,15 @@ class App extends React.Component {
       });
     }
     // serve notification if digression occured
-    if (!isNotificationPresent && 'context' in outputObj && 'system' in outputObj.context && 'digressed' in outputObj.context.system) {
-      this.displayNotification('The virtual assistant is able to answer an unrelated question and return back to the original flow using the Digressions feature.');
+    if (
+      !isNotificationPresent &&
+      'context' in outputObj &&
+      'system' in outputObj.context &&
+      'digressed' in outputObj.context.system
+    ) {
+      this.displayNotification(
+        'The virtual assistant is able to answer an unrelated question and return back to the original flow using the Digressions feature.'
+      );
     }
 
     this.iterateResponese(responses, 0);
@@ -229,7 +254,7 @@ class App extends React.Component {
       if (type !== 'option') {
         this.updateChatList({
           type: 'user',
-          content: text,
+          content: text
         });
       }
       this.sendMessageToConversation(text, this.state.lastMessageContext);
@@ -248,11 +273,13 @@ class App extends React.Component {
     fetchMessage('', null, (err, data) => {
       if (data) {
         this.updateConversationContext(data.context);
-        this.sendMessageToConversation(path.path, this.state.lastMessageContext);
+        this.sendMessageToConversation(
+          path.path,
+          this.state.lastMessageContext
+        );
       }
     });
   }
-
 
   sendMessageToConversation(text, context = null) {
     this.updateMessageStatus(IN_PROGRESS);
@@ -264,10 +291,11 @@ class App extends React.Component {
 
         this.updateChatList({
           type: 'bot',
-          content: 'I\'m having trouble connecting to the server, please refresh the page.',
+          content:
+            "I'm having trouble connecting to the server, please refresh the page."
         });
 
-        const errorMsg = (err) || data;
+        const errorMsg = err || data;
 
         throw new Error(errorMsg);
       }
@@ -289,21 +317,27 @@ class App extends React.Component {
     return (
       <div className="ibm App">
         <SelectionSidebar
-          onPathSelect={(path) => { this.routeToPath(path); }}
+          onPathSelect={path => {
+            this.routeToPath(path);
+          }}
           paths={this.state.paths}
           currentPath={this.state.currentPath}
         />
         <ChatContainer
           messages={this.state.messages}
           chatOptions={this.state.chatOptions}
-          onUserInput={(type, text) => { this.userMessageHandler(type, text); }}
+          onUserInput={(type, text) => {
+            this.userMessageHandler(type, text);
+          }}
           botMessageStatus={this.state.botMessageStatus}
         />
         <OptionsSidebar
           json={this.state.lastMessageJson}
           paths={this.state.paths}
           currentPath={this.state.currentPath}
-          onPathSelect={(path) => { this.routeToPath(path); }}
+          onPathSelect={path => {
+            this.routeToPath(path);
+          }}
           notificationText={this.state.notificationText}
           notificationLink={this.state.notificationLink}
         />
